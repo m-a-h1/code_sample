@@ -1,0 +1,15 @@
+class AppError extends Error {
+  constructor(message, errCode, statusCode, data = {}) {
+    super(message);
+
+    this.errCode = errCode;
+    this.statusCode = statusCode; // 200 ..., 400 ..., 500 ...
+    this.data = data;
+    this.status = false; // true, false
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+module.exports = AppError;

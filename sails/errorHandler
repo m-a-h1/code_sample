@@ -1,0 +1,44 @@
+// send error in development
+const sendErrorDev = (err, res) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    errCode: err.errCode,
+    message: err.message,
+    data: err.data,
+    stack: err.stack,
+  });
+};
+
+// send error in porduction
+const sendErrorProd = (error, res) => {
+  // Operatioanl, trusted error: send message to client
+  if (error.isOperational) {
+    res.status(error.statusCode).json({
+      status: error.status,
+      errCode: error.errCode,
+      message: error.messgae,
+      data: error.data,
+    });
+    // programming or other unknown error: don't leak error detail to client
+  } else {
+    // -- 1) log the error first
+    console.log("Error: ", error);
+
+    // -- 2) send the error
+    res.status(500).json({
+      status: false,
+      errCode: 0,
+      message: "there is a problem in system. please be pationt",
+    });
+  }
+};
+
+module.exports = (req, res, err) => {
+  err.statusCode = err.statusCode || 500;
+
+  if (sails.config.environment === "development") {
+    sendErrorDev(err, res);
+  } else if (sails.config.environment === "production") {
+    sendErrorProd(err, res);
+  }
+};

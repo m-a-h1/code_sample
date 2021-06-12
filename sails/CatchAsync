@@ -1,0 +1,9 @@
+module.exports = (fn) => {
+  return (req, res) => {
+    const args = arguments;
+    fn(req, res).catch((err) => {
+      logger.error(err);
+      errorHandler(req, res, err);
+    });
+  };
+};
